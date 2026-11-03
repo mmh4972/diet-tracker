@@ -69,7 +69,7 @@ button { cursor: pointer; }
 .logo { width: 34px; height: 34px; }
 .top h1 { flex: 1; margin: 0; font-size: 18px; font-weight: 700; letter-spacing: .02em; }
 .who { background: var(--green); color: var(--green-ink); border-radius: 999px; padding: 6px 14px; font-weight: 700; font-size: 14px; max-width: 45%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.sync { font-size: 12px; color: var(--muted); text-align: center; margin-top: -6px; }
+.sync { font-size: 12px; color: var(--muted); text-align: center; padding-top: 10px; }
 .sync.bad { color: var(--red); }
 
 .card { background: var(--card); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
@@ -212,11 +212,6 @@ button { cursor: pointer; }
 </head>
 <body>
 <div class="wrap" id="app" hidden>
-  <div class="top">
-    <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path d="M8 14c6 2 10 7 12 16-7-1-12-7-12-16z" fill="var(--green)"/><path d="M18 30C17 18 24 9 34 7c1 11-6 20-16 23z" fill="var(--yellow)"/></svg>
-    <h1 id="pageTitle">今日</h1>
-    <span class="who" id="who">尚未登入</span>
-  </div>
   <div class="sync" id="sync">連線中…</div>
   <main class="wrap" id="main"></main>
 </div>
@@ -240,7 +235,7 @@ button { cursor: pointer; }
 </div>
 
 <nav class="tabbar" id="tabbar" hidden>
-  <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>今日</button>
+  <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>總覽</button>
   <button data-tab="weight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="4" width="17" height="16" rx="3"/><path d="M8.5 10a3.5 3.5 0 0 1 7 0"/><path d="M12 10l1.5-2"/></svg>體重體脂</button>
   <button data-tab="diet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/></svg>飲食記錄</button>
   <button data-tab="sport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17h15c2 0 3-1 3-2l-6-2-3-5-3 2 1 3-5-1z"/><path d="M3 20h18"/></svg>運動記錄</button>
@@ -377,7 +372,6 @@ if (configured) {
     unsubs.forEach((u) => u()); unsubs = [];
     if (!user) { uid = null; days = {}; settings = JSON.parse(JSON.stringify(DEFAULTS)); showLogin(); return; }
     uid = user.uid;
-    $('who').textContent = (user.email || '').split('@')[0];
     showApp();
     setSync('連線中…');
     unsubs.push(onSnapshot(doc(fs, 'users', uid), (snap) => {
@@ -490,7 +484,6 @@ function lineChart(points, color, opts = {}) {
 const TITLES = { home: '今日', weight: '體重體脂', diet: '飲食記錄', sport: '運動記錄', me: '設定' };
 function render() {
   document.querySelectorAll('#tabbar button').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
-  $('pageTitle').textContent = tab === 'diet' && dietDetail ? '飲食明細' : TITLES[tab];
   const fn = { home: viewHome, weight: viewWeight, diet: dietDetail ? viewDietDay : viewDiet, sport: viewSport, me: viewMe }[tab];
   $('main').innerHTML = fn();
 }
