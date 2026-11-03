@@ -16,7 +16,7 @@
   --green: #08845e; --green-ink: #ffffff; --green-soft: #dcf2e8; --bright: #17b26a;
   --orange: #f2a116; --orange-ink: #b36d00; --orange-soft: #fff5e1;
   --yellow: #f6d63a; --yellow-ink: #6b5600;
-  --purple: #7d5ae0; --purple-soft: #efe9ff;
+  --purple: #c8466e; --purple-soft: #ffe3ec;
   --blue: #2f80ed; --sport: #4f54e0; --sport-soft: #eceefe;
   --red: #d6453a; --shade: rgba(10, 20, 16, .42);
   --f-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
@@ -28,7 +28,7 @@
     --green: #2bb784; --green-ink: #06231a; --green-soft: #173a2c; --bright: #3ccf89;
     --orange: #f5b13e; --orange-ink: #f8c46a; --orange-soft: #3a2c12;
     --yellow: #e8c938; --yellow-ink: #2a2200;
-    --purple: #a88cff; --purple-soft: #2c2445;
+    --purple: #ff8fae; --purple-soft: #4a2231;
     --blue: #6aa6ff; --sport: #8b8fff; --sport-soft: #25284a;
     --red: #ff7a6e; --shade: rgba(0, 0, 0, .6);
     color-scheme: dark;
@@ -39,7 +39,7 @@
   --green: #2bb784; --green-ink: #06231a; --green-soft: #173a2c; --bright: #3ccf89;
   --orange: #f5b13e; --orange-ink: #f8c46a; --orange-soft: #3a2c12;
   --yellow: #e8c938; --yellow-ink: #2a2200;
-  --purple: #a88cff; --purple-soft: #2c2445;
+  --purple: #ff8fae; --purple-soft: #4a2231;
   --blue: #6aa6ff; --sport: #8b8fff; --sport-soft: #25284a;
   --red: #ff7a6e; --shade: rgba(0, 0, 0, .6);
   color-scheme: dark;
@@ -144,7 +144,7 @@ button { cursor: pointer; }
 .mini .k { font-size: 12px; color: var(--muted); }
 .mini .v { font-size: 19px; font-weight: 700; border-radius: 12px; padding: 6px 0; }
 .v.pos { color: var(--orange-ink); background: var(--orange-soft); }
-.v.neg { color: var(--purple); }
+.v.neg { color: var(--purple); background: var(--purple-soft); }
 .v.zero { color: var(--muted); }
 .sport-row { display: flex; align-items: center; gap: 14px; padding: 0 6px; }
 .sport-row .num { font-size: 28px; font-weight: 700; }
@@ -265,8 +265,8 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { initializeFirestore, persistentLocalCache, doc, collection, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 // ======= 常數與工具 =======
-const APP_VERSION = 'v1.7';
-const APP_UPDATED = '2026-11-03 18:20';
+const APP_VERSION = 'v1.8';
+const APP_UPDATED = '2026-11-03 18:30';
 const CATS = [
   { k: 'staple', n: '主食' }, { k: 'meat', n: '肉類' }, { k: 'fruit', n: '水果' }, { k: 'veg', n: '蔬菜' },
 ];
@@ -604,7 +604,7 @@ function viewDiet() {
     '<div class="rate">' + (monthD.getMonth() + 1) + ' 月飲食達標率<b class="num">' + (mk.length ? (Math.round(met / mk.length * 1000) / 10) : 0) + '%</b><span class="hint">四類份數都和目標相差 0.5 份以內，算當天達標</span></div>' +
     filterTabs('dFilter', dietFilter, ['全部', '已達標', '未達標']) +
     '<div class="list">' + (list.length ? list.map((k) => '<button class="item' + (hasMeals(k) ? '' : ' missing') + '" data-act="openDiet" data-k="' + k + '"><div class="item-h"><span class="num">' + k + '</span>' + (dietMet(k) ? '<span class="flag">達標</span>' : '') + '<span class="sp"></span>' + (hasMeals(k) ? '剩餘份數 ›' : '未記錄 ›') + '</div>' + miniRow(k) + '</button>').join('') : '<div class="empty">這個篩選沒有資料</div>') + '</div>' +
-    '<p class="p">橘色是還可以吃的份數，紫色負數是吃超過的份數。</p></section>';
+    '<p class="p">橘色是還可以吃的份數，粉紅色負數是吃超過的份數。</p></section>';
 }
 
 function viewDietDay() {
@@ -624,7 +624,18 @@ function viewDietDay() {
   '<div class="datebar"><button class="navbtn" data-act="dietDay" data-n="-1" aria-label="前一天">‹</button><div class="d num">' + k + '（' + WD[dateOf(k).getDay()] + '）</div><button class="navbtn" data-act="dietDay" data-n="1" aria-label="後一天"' + (k >= tk ? ' disabled' : '') + '>›</button></div>' +
   '<section class="card"><div class="card-h"><h2>當日剩餘目標</h2>' + (dietMet(k) ? '<span class="flag" style="color:var(--green);background:var(--green-soft);border-radius:99px;padding:2px 10px;font-weight:700;font-size:13px">達標</span>' : '') + '</div>' + chips4(k) +
     '<p class="p num">目標：' + CATS.map((c) => c.n + ' ' + fmt(dayTarget(k)[c.k])).join('、') + ' 份</p></section>' +
-  '<section class="card"><div class="card-h"><h2>份量記錄</h2><button class="btn green sm" data-act="mealSheet" data-k="' + k + '">＋ 新增飲食</button></div>' + groups + '</section>';
+  '<section class="card"><div class="card-h"><h2>份量記錄</h2><button class="btn green sm" data-act="mealSheet" data-k="' + k + '">＋ 新增飲食</button></div>' + groups + '</section>' +
+  bodyCard(k);
+}
+
+function bodyCard(k) {
+  const d = day(k), water = numOr(d.water, 0), wt = numOr(settings.water, 2200);
+  return '<section class="card"><div class="card-h"><h2>水分與排便</h2></div>' +
+    '<div class="row"><span class="lab">水分攝取</span><span class="water-val num">' + water + ' ml</span><span class="water-tgt num">/ ' + wt + ' ml</span></div>' +
+    '<div class="bar"><i style="width:' + Math.min(100, water / wt * 100) + '%"></i></div>' +
+    '<button class="btn yellow" data-act="waterSheet" data-k="' + k + '">填寫水分</button>' +
+    '<div class="row"><span class="lab">排便狀況</span><span style="font-weight:700">' + esc(d.bowel || '尚未填寫') + '</span></div>' +
+    '<button class="btn orange" data-act="bowelSheet" data-k="' + k + '">填寫排便</button></section>';
 }
 
 function viewSport() {
