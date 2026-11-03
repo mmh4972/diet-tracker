@@ -265,8 +265,8 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { initializeFirestore, persistentLocalCache, doc, collection, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 // ======= 常數與工具 =======
-const APP_VERSION = 'v1.5';
-const APP_UPDATED = '2026-11-03 17:56';
+const APP_VERSION = 'v1.6';
+const APP_UPDATED = '2026-11-03 18:05';
 const CATS = [
   { k: 'staple', n: '主食' }, { k: 'meat', n: '肉類' }, { k: 'fruit', n: '水果' }, { k: 'veg', n: '蔬菜' },
 ];
@@ -275,7 +275,7 @@ const MEALS = ['早餐', '午餐', '晚餐', '其他'];
 const BOWEL = ['順暢', '普通', '偏硬', '腹瀉', '今天沒排'];
 const DEFAULTS = {
   height: '', targets: { staple: 11, meat: 9, fruit: 2, veg: 1.5 }, water: 2200,
-  sports: ['桌球', '重訓', '走路', '跑步', '游泳', '騎車'],
+  sports: ['有氧', '無氧'],
 };
 const $ = (id) => document.getElementById(id);
 const pad = (n) => String(n).padStart(2, '0');
@@ -327,6 +327,13 @@ function hasMeals(k) { return (day(k).meals || []).length > 0; }
 function dietMet(k) { if (!hasMeals(k)) return false; const r = remaining(k); return CATS.every((c) => Math.abs(r[c.k]) <= 0.5); }
 function hasWeight(k) { return day(k).w != null && day(k).w !== ''; }
 function sportHours(k) { return (day(k).ex || []).reduce((a, e) => a + numOr(e.hours, 0), 0); }
+// 運動加份：有氧 1/2/3 小時以上 主肉各 +1/+1.5/+2；無氧 1 小時以上 主 +1、肉 +2
+function sportBonus(type, h) {
+  if (!(h >= 1)) return { s: 0, m: 0 };
+  if (type === '無氧') return { s: 1, m: 2 };
+  const v = h >= 3 ? 2 : h >= 2 ? 1.5 : 1;
+  return { s: v, m: v };
+}
 function monthKeys(m) {
   const out = [], last = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate(), tk = todayKey();
   for (let d = 1; d <= last; d++) { const k = keyOf(new Date(m.getFullYear(), m.getMonth(), d)); if (k <= tk) out.push(k); }
@@ -634,7 +641,7 @@ function viewSport() {
   return '' +
   '<section class="card"><div class="card-h"><h2>今日飲食目標加份</h2></div>' +
     '<div class="grid2"><div style="font-size:20px">主食 <b class="num" style="color:var(--bright)">+ ' + fmt(tgt.staple - base.staple) + '</b> 份</div><div style="font-size:20px">肉類 <b class="num" style="color:var(--bright)">+ ' + fmt(tgt.meat - base.meat) + '</b> 份</div></div>' +
-    '<p class="p">新增運動時填入營養師建議的加份數，當天飲食目標就會自動增加。</p></section>' +
+    '<p class="p">有氧：1 小時主食、肉類各 +1，2 小時各 +1.5，3 小時以上各 +2。無氧：1 小時以上主食 +1、肉類 +2。</p></section>' +
   '<section class="card"><div class="card-h"><h2>運動趨勢</h2>' + segRange('sRange', sportRange) + '</div>' +
     '<div class="metrics" style="grid-template-columns:1fr"><div class="metric sport on"><div class="k"><i style="background:var(--sport)"></i>時數</div><div class="v num">' + fmt(total) + '<small>小時</small></div><div class="sub">平均 ' + fmt(total / sportRange) + ' 小時／天</div></div></div>' +
     lineChart(pts, 'var(--sport)', { zero: true, label: '運動時數趨勢', emptyText: '至少要兩天有運動，才畫得出趨勢' }) + '</section>' +
@@ -655,7 +662,6 @@ function viewMe() {
     '<p class="p">照營養師給你的份數填寫，改完按儲存。</p>' +
     '<div class="grid2">' + inp('sHeight', '身高', settings.height, 'cm') + inp('sWater', '每日喝水目標', settings.water, 'ml') + '</div>' +
     '<div class="grid2">' + CATS.map((c) => inp('sT_' + c.k, c.n, t[c.k], '份')).join('') + '</div>' +
-    '<div class="field"><span>運動種類（用逗號分隔）</span><input class="inp" id="sSports" value="' + esc((settings.sports || []).join('、')) + '"></div>' +
     '<button class="btn orange" data-act="saveSettings">儲存設定</button><p class="p" id="setMsg" aria-live="polite"></p></section>' +
   '<section class="card"><div class="card-h"><h2>備份資料</h2></div>' +
     '<p class="p">把所有紀錄匯出成 CSV，可以用 Google 試算表或 Excel 打開，也能存到 Google 雲端硬碟留底。</p>' +
@@ -713,13 +719,20 @@ function mealSheet(k, id) {
   $('sheet').dataset.meal = meal;
 }
 function sportSheet(k) {
-  const types = settings.sports && settings.sports.length ? settings.sports : DEFAULTS.sports;
+  const types = DEFAULTS.sports;
   openSheet(sheetHead('新增運動') + dateField(k) +
     '<div class="field"><span>運動種類</span><div class="choice-row">' + types.map((t, i) => '<button class="choice' + (i === 0 ? ' on' : '') + '" data-act="pickSport" data-v="' + esc(t) + '">' + esc(t) + '</button>').join('') + '</div></div>' +
-    '<div class="grid3">' + inp('fHours', '時數', '1', '小時') + inp('fAddS', '主食加', '', '份') + inp('fAddM', '肉類加', '', '份') + '</div>' +
-    '<p class="p">加份數照營養師建議填，不確定就留空。</p>' + sheetFoot('saveSport'));
+    inp('fHours', '時數', '1', '小時') +
+    '<p class="p" id="fBonus"></p>' + sheetFoot('saveSport'));
   $('sheet').dataset.sport = types[0];
+  showBonus();
 }
+function showBonus() {
+  const el = $('fBonus'); if (!el) return;
+  const b = sportBonus($('sheet').dataset.sport, numOr($('fHours').value, 0));
+  el.textContent = '當天飲食目標：主食 +' + fmt(b.s) + ' 份、肉類 +' + fmt(b.m) + ' 份';
+}
+document.addEventListener('input', (e) => { if (e.target.id === 'fHours') showBonus(); });
 function sheetErr(t) { $('sheetErr').textContent = t; }
 function readNum(id, opt) {
   const raw = $(id).value.trim();
@@ -772,7 +785,7 @@ document.addEventListener('click', (ev) => {
     case 'setBowel': saveDay(k, { bowel: b.dataset.v || undefined }); closeSheet(); break;
     case 'pickMeal': case 'pickSport':
       b.parentElement.querySelectorAll('.choice').forEach((x) => x.classList.toggle('on', x === b));
-      $('sheet').dataset[a === 'pickMeal' ? 'meal' : 'sport'] = b.dataset.v; break;
+      $('sheet').dataset[a === 'pickMeal' ? 'meal' : 'sport'] = b.dataset.v; showBonus(); break;
     case 'saveMeal': {
       const dk = $('fDate').value;
       if (!dk || dk > todayKey()) return sheetErr('請選今天或之前的日期');
@@ -794,11 +807,10 @@ document.addEventListener('click', (ev) => {
       armed = null; saveDay(k, { meals: (day(k).meals || []).filter((m) => m.id !== b.dataset.id) }); break;
     }
     case 'saveSport': {
-      const dk = $('fDate').value, h = readNum('fHours'), as = readNum('fAddS', true), am = readNum('fAddM', true);
+      const dk = $('fDate').value, h = readNum('fHours'), type = $('sheet').dataset.sport, bn = sportBonus(type, h);
       if (!dk || dk > todayKey()) return sheetErr('請選今天或之前的日期');
       if (!(h > 0 && h <= 24)) return sheetErr('時數請輸入 0 到 24 之間，例如 1.5');
-      if ((as !== undefined && !(as >= 0 && as <= 10)) || (am !== undefined && !(am >= 0 && am <= 10))) return sheetErr('加份數請輸入 0 到 10，或留空');
-      const ex = (day(dk).ex || []).concat({ id: uid6(), type: $('sheet').dataset.sport, hours: h, addStaple: as || 0, addMeat: am || 0 });
+      const ex = (day(dk).ex || []).concat({ id: uid6(), type, hours: h, addStaple: bn.s, addMeat: bn.m });
       saveDay(dk, { ex }); closeSheet(); break;
     }
     case 'delSport': {
@@ -810,8 +822,7 @@ document.addEventListener('click', (ev) => {
       for (const c of CATS) { const v = parseFloat($('sT_' + c.k).value); if (!(v >= 0 && v <= 40)) { $('setMsg').textContent = c.n + '請輸入 0 到 40 的份數'; return; } tg[c.k] = v; }
       const water = parseFloat($('sWater').value);
       if (!(water >= 500 && water <= 8000)) { $('setMsg').textContent = '喝水目標請輸入 500 到 8000 ml'; return; }
-      const sports = $('sSports').value.split(/[,，、\s]+/).map((s) => s.trim()).filter(Boolean).slice(0, 20);
-      settings = Object.assign({}, settings, { height: $('sHeight').value.trim(), water: Math.round(water), targets: tg, sports: sports.length ? sports : DEFAULTS.sports });
+      settings = Object.assign({}, settings, { height: $('sHeight').value.trim(), water: Math.round(water), targets: tg });
       saveSettings(); $('setMsg').textContent = '已儲存'; break;
     }
     case 'export': exportCsv(); break;
