@@ -187,8 +187,6 @@ button { cursor: pointer; }
 .p { margin: 0; color: var(--muted); font-size: 14px; }
 .err { color: var(--red); font-size: 14px; margin: 0; }
 .ver { background: var(--green-soft); color: var(--green); border-radius: 999px; padding: 2px 12px; font-weight: 700; font-size: 15px; }
-.log { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--muted); }
-.log b { color: var(--ink); margin-right: 8px; }
 
 .backdrop { position: fixed; inset: 0; background: var(--shade); z-index: 30; }
 .sheet {
@@ -267,14 +265,8 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { initializeFirestore, persistentLocalCache, doc, collection, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 // ======= 常數與工具 =======
-const APP_VERSION = 'v1.3';
-const APP_UPDATED = '2026-11-03';
-const CHANGELOG = [
-  ['v1.3', '設定頁顯示版本號與更新紀錄'],
-  ['v1.2', '新增飲食只留主食、肉類、水果、蔬菜；點心改為其他；輸入框符合手機寬度'],
-  ['v1.1', '移除頂部標題列；第一個分頁改為總覽'],
-  ['v1.0', '網站上線：Email 註冊登入，每人資料分開'],
-];
+const APP_VERSION = 'v1.4';
+const APP_UPDATED = '2026-11-03 17:52';
 const CATS = [
   { k: 'staple', n: '主食' }, { k: 'meat', n: '肉類' }, { k: 'fruit', n: '水果' }, { k: 'veg', n: '蔬菜' },
 ];
@@ -673,8 +665,7 @@ function viewMe() {
     '<p class="p">每個人用自己的 Email 註冊，各記各的，彼此看不到對方的紀錄。太太只要打開同一個網址，按「註冊新帳號」就可以開始用。</p>' +
     '<button class="btn ghost" data-act="logout">登出</button></section>' +
   '<section class="card"><div class="card-h"><h2>版本</h2><span class="ver num">' + APP_VERSION + '</span></div>' +
-    '<p class="p">更新日期：' + APP_UPDATED + '</p>' +
-    '<ul class="log">' + CHANGELOG.map((c) => '<li><b class="num">' + c[0] + '</b>' + esc(c[1]) + '</li>').join('') + '</ul></section>';
+    '<p class="p">更新時間：' + APP_UPDATED + '</p></section>';
 }
 function inp(id, label, val, unit) {
   return '<label class="field"><span>' + label + '</span><div class="inp-wrap"><input class="inp num" id="' + id + '" inputmode="decimal" value="' + esc(val ?? '') + '"><span class="u">' + unit + '</span></div></label>';
