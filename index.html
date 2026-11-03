@@ -55,14 +55,14 @@ html, body { margin: 0; overflow-x: hidden; }
 .login .switch { text-align: center; font-size: 14px; color: var(--muted); }
 .ok { color: var(--green); font-size: 14px; margin: 0; }
 body {
-  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55;
   padding-block: 0 calc(84px + env(safe-area-inset-bottom, 0px));
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
-.wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.wrap { width: 100%; max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 .num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
 
 .top { display: flex; align-items: center; gap: 10px; padding-top: 12px; }
@@ -72,15 +72,15 @@ button { cursor: pointer; }
 .sync { font-size: 12px; color: var(--muted); text-align: center; padding-top: 10px; }
 .sync.bad { color: var(--red); }
 
-.card { background: var(--card); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.card { background: var(--card); border-radius: 22px; padding: 22px 20px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 .card-h { display: flex; align-items: center; gap: 8px; }
-.card-h h2 { margin: 0; flex: 1; font-size: 17px; font-weight: 700; }
+.card-h h2 { margin: 0; flex: 1; font-size: 19px; font-weight: 700; }
 .link { border: none; background: none; color: var(--green); font-weight: 700; padding: 4px 0; font-size: 15px; }
 .big-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 8px; }
 .stat-label { color: var(--muted); font-size: 15px; }
 .stat-val { font-size: 40px; font-weight: 700; line-height: 1.1; }
 .stat-val small, .unit { font-size: 15px; color: var(--muted); font-weight: 500; margin-left: 4px; }
-.btn { border: none; border-radius: 999px; height: 50px; font-weight: 700; font-size: 17px; letter-spacing: .1em; width: 100%; }
+.btn { border: none; border-radius: 999px; height: 54px; font-weight: 700; font-size: 18px; letter-spacing: .1em; width: 100%; }
 .btn.orange { background: var(--orange); color: #fff; }
 .btn.yellow { background: var(--yellow); color: var(--yellow-ink); }
 .btn.green { background: var(--bright); color: #fff; }
@@ -94,10 +94,10 @@ button { cursor: pointer; }
 .bar i { display: block; height: 100%; background: var(--yellow); border-radius: 99px; }
 
 .chips4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.chip4 { background: var(--orange-soft); border-radius: 999px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; color: var(--orange-ink); }
+.chip4 { background: var(--orange-soft); border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; gap: 10px; color: var(--orange-ink); }
 .chip4 b { font-size: 17px; }
 .chip4 span { flex: 1; font-size: 13px; opacity: .8; }
-.chip4 .num { font-size: 24px; font-weight: 700; }
+.chip4 .num { font-size: 28px; font-weight: 700; }
 .chip4.over { background: var(--purple-soft); color: var(--purple); }
 .chip4.zero { background: var(--green-soft); color: var(--green); }
 
@@ -132,7 +132,7 @@ button { cursor: pointer; }
 .tabs button { border: none; background: none; padding: 8px 4px; font-weight: 700; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
 .tabs button.on { color: var(--green); border-color: var(--green); }
 .list { display: flex; flex-direction: column; gap: 10px; }
-.item { border: 1px solid var(--line); background: var(--card); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; text-align: left; width: 100%; }
+.item { border: 1px solid var(--line); background: var(--card); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 6px; text-align: left; width: 100%; }
 .item.missing { background: var(--bg); }
 .item-h { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 15px; }
 .item-h .flag { color: var(--green); font-weight: 700; font-size: 12px; background: var(--green-soft); border-radius: 99px; padding: 1px 8px; }
@@ -140,9 +140,9 @@ button { cursor: pointer; }
 .wf { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0 12px; }
 .wf .num { font-size: 28px; font-weight: 700; }
 .miss { color: var(--muted); font-size: 14px; padding: 0 12px; }
-.mini { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.mini { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; text-align: center; }
 .mini .k { font-size: 12px; color: var(--muted); }
-.mini .v { font-size: 17px; font-weight: 700; border-radius: 99px; padding: 2px 0; }
+.mini .v { font-size: 19px; font-weight: 700; border-radius: 12px; padding: 6px 0; }
 .v.pos { color: var(--orange-ink); background: var(--orange-soft); }
 .v.neg { color: var(--purple); }
 .v.zero { color: var(--muted); }
@@ -155,9 +155,9 @@ button { cursor: pointer; }
 
 .targets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; text-align: center; }
 .targets .k { color: var(--muted); font-size: 14px; }
-.targets .v { font-size: 22px; font-weight: 700; }
+.targets .v { font-size: 26px; font-weight: 700; }
 .targets .v small { font-size: 13px; font-weight: 500; }
-.meal { border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.meal { border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
 .meal h3 { margin: 0; color: var(--green); font-size: 16px; display: flex; gap: 8px; align-items: center; }
 .meal h3 span { flex: 1; }
 .meal h3 .t { color: var(--muted); font-weight: 500; font-size: 13px; flex: none; }
@@ -191,7 +191,7 @@ button { cursor: pointer; }
 .backdrop { position: fixed; inset: 0; background: var(--shade); z-index: 30; }
 .sheet {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; background: var(--card); border-radius: 22px 22px 0 0;
-  max-width: 560px; margin: 0 auto; max-height: 90vh; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 14px;
+  max-width: 640px; margin: 0 auto; max-height: 90vh; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 14px;
   padding: 18px max(18px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 20px) max(18px, env(safe-area-inset-left, 0px));
 }
 .sheet-h { display: flex; align-items: center; }
@@ -207,8 +207,8 @@ button { cursor: pointer; }
   display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 6px max(6px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
 }
-.tabbar button { border: none; background: none; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; color: var(--muted); font-size: 12px; }
-.tabbar svg { width: 26px; height: 26px; }
+.tabbar button { border: none; background: none; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; color: var(--muted); font-size: 13px; }
+.tabbar svg { width: 28px; height: 28px; }
 .tabbar button.on { color: var(--green); font-weight: 700; }
 </style>
 
@@ -265,8 +265,8 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { initializeFirestore, persistentLocalCache, doc, collection, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 // ======= 常數與工具 =======
-const APP_VERSION = 'v1.6';
-const APP_UPDATED = '2026-11-03 18:05';
+const APP_VERSION = 'v1.7';
+const APP_UPDATED = '2026-11-03 18:20';
 const CATS = [
   { k: 'staple', n: '主食' }, { k: 'meat', n: '肉類' }, { k: 'fruit', n: '水果' }, { k: 'veg', n: '蔬菜' },
 ];
