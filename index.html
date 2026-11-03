@@ -17,7 +17,7 @@
   --orange: #f2a116; --orange-ink: #b36d00; --orange-soft: #fff5e1;
   --yellow: #f6d63a; --yellow-ink: #6b5600;
   --purple: #c8466e; --purple-soft: #ffe3ec;
-  --blue: #2f80ed; --sport: #4f54e0; --sport-soft: #eceefe;
+  --blue: #2f80ed; --blue-soft: #e8f2fe; --sport: #4f54e0; --sport-soft: #eceefe;
   --red: #d6453a; --shade: rgba(10, 20, 16, .42);
   --f-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --f-num: "Barlow", "Noto Sans TC", system-ui, sans-serif;
@@ -29,7 +29,7 @@
     --orange: #f5b13e; --orange-ink: #f8c46a; --orange-soft: #3a2c12;
     --yellow: #e8c938; --yellow-ink: #2a2200;
     --purple: #ff8fae; --purple-soft: #4a2231;
-    --blue: #6aa6ff; --sport: #8b8fff; --sport-soft: #25284a;
+    --blue: #6aa6ff; --blue-soft: #16263b; --sport: #8b8fff; --sport-soft: #25284a;
     --red: #ff7a6e; --shade: rgba(0, 0, 0, .6);
     color-scheme: dark;
   }
@@ -40,7 +40,7 @@
   --orange: #f5b13e; --orange-ink: #f8c46a; --orange-soft: #3a2c12;
   --yellow: #e8c938; --yellow-ink: #2a2200;
   --purple: #ff8fae; --purple-soft: #4a2231;
-  --blue: #6aa6ff; --sport: #8b8fff; --sport-soft: #25284a;
+  --blue: #6aa6ff; --blue-soft: #16263b; --sport: #8b8fff; --sport-soft: #25284a;
   --red: #ff7a6e; --shade: rgba(0, 0, 0, .6);
   color-scheme: dark;
 }
@@ -182,8 +182,17 @@ button { cursor: pointer; }
 .choice-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .choice { border: 1.5px solid var(--line); background: var(--card); border-radius: 999px; padding: 8px 16px; font-weight: 500; }
 .choice.on { border-color: var(--green); background: var(--green-soft); color: var(--green); font-weight: 700; }
-.quick { display: flex; gap: 8px; flex-wrap: wrap; }
-.quick button { flex: 1; min-width: 70px; border: none; border-radius: 999px; height: 44px; background: var(--orange-soft); color: var(--orange-ink); font-weight: 700; }
+.quick { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.wsum { display: flex; align-items: center; gap: 12px; background: var(--blue-soft); color: var(--blue); border-radius: 18px; padding: 16px 18px; }
+.wsum span { color: var(--ink); font-size: 15px; line-height: 1.4; }
+.wsum span:first-of-type { flex: 1; }
+.wsum b { font-size: 36px; font-weight: 700; line-height: 1; }
+.wleft { font-size: 24px; color: var(--orange); font-weight: 700; }
+.wrows { display: flex; flex-direction: column; gap: 10px; }
+.wrow { display: flex; align-items: center; gap: 8px; }
+.wrow .inp-wrap { flex: 1; }
+.wdel { flex: none; width: 56px; }
+.quick button { min-width: 0; padding: 0; border: none; border-radius: 999px; height: 44px; background: var(--orange-soft); color: var(--orange-ink); font-weight: 700; }
 .p { margin: 0; color: var(--muted); font-size: 14px; }
 .err { color: var(--red); font-size: 14px; margin: 0; }
 .ver { background: var(--green-soft); color: var(--green); border-radius: 999px; padding: 2px 12px; font-weight: 700; font-size: 15px; }
@@ -265,8 +274,8 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { initializeFirestore, persistentLocalCache, doc, collection, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 // ======= 常數與工具 =======
-const APP_VERSION = 'v1.8';
-const APP_UPDATED = '2026-11-03 18:30';
+const APP_VERSION = 'v1.9';
+const APP_UPDATED = '2026-11-03 18:40';
 const CATS = [
   { k: 'staple', n: '主食' }, { k: 'meat', n: '肉類' }, { k: 'fruit', n: '水果' }, { k: 'veg', n: '蔬菜' },
 ];
@@ -703,11 +712,31 @@ function weightSheet(k) {
     sheetFoot('saveWeight'));
 }
 function waterSheet(k) {
-  const w = numOr(day(k).water, 0);
-  openSheet(sheetHead('水分攝取') + '<p class="p">' + prettyDate(k) + ' 目前 <b class="num">' + w + '</b> ml，目標 ' + settings.water + ' ml</p>' +
-    '<div class="quick">' + [150, 250, 350, 500].map((n) => '<button data-act="addWater" data-k="' + k + '" data-n="' + n + '">+' + n + '</button>').join('') + '</div>' +
-    inp('fWater', '或直接輸入全天總量', w, 'ml') + sheetFoot('saveWater'));
+  const d = day(k);
+  const log = Array.isArray(d.waterLog) ? d.waterLog.slice() : (numOr(d.water, 0) > 0 ? [numOr(d.water, 0)] : []);
+  openSheet(sheetHead('水分攝取') +
+    '<div class="wsum"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z"/><path d="M9 15a3 3 0 0 0 3 3"/></svg>' +
+    '<span>' + prettyDate(k) + '<br>水分攝取統計</span><b class="num" id="wTotal">0</b><span>ml</span></div>' +
+    '<p class="p" id="wLeft"></p>' +
+    '<div class="quick">' + [150, 250, 450, 600, 700].map((n) => '<button data-act="addWater" data-n="' + n + '">+' + n + '</button>').join('') + '</div>' +
+    '<div class="field"><span>飲水量（每喝一次記一筆）</span><div class="wrows" id="wRows"></div></div>' + sheetFoot('saveWater'));
   $('sheet').dataset.k = k;
+  renderWaterRows(log);
+}
+function waterRow(v, i) {
+  return '<div class="wrow"><div class="inp-wrap"><input class="inp num" inputmode="numeric" data-w="1" placeholder="輸入毫升數" value="' + (v === '' ? '' : esc(v)) + '"><span class="u">ml</span></div>' +
+    (i < 0 ? '<span class="wdel"></span>' : '<button class="trash wdel" data-act="delWater" data-i="' + i + '">刪除</button>') + '</div>';
+}
+function renderWaterRows(vals) {
+  $('wRows').innerHTML = vals.map((v, i) => waterRow(v, i)).join('') + waterRow('', -1);
+  updateWaterSum();
+}
+function readWaterRows() { return [...document.querySelectorAll('[data-w]')].map((x) => x.value.trim()).filter((v) => v !== '').map(Number); }
+function updateWaterSum() {
+  const total = readWaterRows().filter((v) => v > 0).reduce((a, v) => a + v, 0);
+  const left = numOr(settings.water, 2200) - total;
+  $('wTotal').textContent = Math.round(total);
+  $('wLeft').innerHTML = left > 0 ? '再喝 <b class="num wleft">' + Math.round(left) + '</b> ml 就可以達成目標，加油！' : '已達成今天的喝水目標，很棒！';
 }
 function bowelSheet(k) {
   const cur = day(k).bowel;
@@ -743,7 +772,14 @@ function showBonus() {
   const b = sportBonus($('sheet').dataset.sport, numOr($('fHours').value, 0));
   el.textContent = '當天飲食目標：主食 +' + fmt(b.s) + ' 份、肉類 +' + fmt(b.m) + ' 份';
 }
-document.addEventListener('input', (e) => { if (e.target.id === 'fHours') showBonus(); });
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'fHours') showBonus();
+  if (e.target.dataset && e.target.dataset.w) {
+    const all = document.querySelectorAll('[data-w]');
+    if (e.target === all[all.length - 1] && e.target.value.trim() !== '') $('wRows').insertAdjacentHTML('beforeend', waterRow('', -1));
+    updateWaterSum();
+  }
+});
 function sheetErr(t) { $('sheetErr').textContent = t; }
 function readNum(id, opt) {
   const raw = $(id).value.trim();
@@ -787,11 +823,12 @@ document.addEventListener('click', (ev) => {
       saveDay(dk, { w, fat: f }); closeSheet(); break;
     }
     case 'clearWeight': { const d = Object.assign({}, day(k)); delete d.w; delete d.fat; days[k] = d; saveDay(k, {}); closeSheet(); break; }
-    case 'addWater': { const v = numOr($('fWater').value, 0) + n; $('fWater').value = v; break; }
+    case 'addWater': { const vals = readWaterRows(); vals.push(n); renderWaterRows(vals); break; }
+    case 'delWater': { const vals = [...document.querySelectorAll('[data-w]')].slice(0, -1).map((x) => x.value.trim()); vals.splice(Number(b.dataset.i), 1); renderWaterRows(vals.filter((v) => v !== '')); break; }
     case 'saveWater': {
-      const v = readNum('fWater');
-      if (!(v >= 0 && v < 10000)) return sheetErr('請輸入 0 到 10000 之間的毫升數');
-      saveDay($('sheet').dataset.k, { water: Math.round(v) }); closeSheet(); break;
+      const vals = readWaterRows();
+      if (vals.some((v) => !(v > 0 && v <= 3000))) return sheetErr('每一筆請輸入 1 到 3000 之間的毫升數');
+      saveDay($('sheet').dataset.k, { waterLog: vals, water: Math.round(vals.reduce((a, v) => a + v, 0)) }); closeSheet(); break;
     }
     case 'setBowel': saveDay(k, { bowel: b.dataset.v || undefined }); closeSheet(); break;
     case 'pickMeal': case 'pickSport':
